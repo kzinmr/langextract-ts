@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import type { GenerateConfig, LanguageModel } from "../baseModel.js";
-import { ensureCredentialsFileFromEnv } from "./credentials.js";
+import { googleAuthOptionsFromEnv, type GoogleAuthOptionsLike } from "./credentials.js";
 
 export interface GeminiModelOptions {
   apiKey?: string;
@@ -9,6 +9,7 @@ export interface GeminiModelOptions {
   location?: string;
   model: string;
   apiVersion?: string;
+  googleAuthOptions?: GoogleAuthOptionsLike;
 }
 
 export class GeminiModel implements LanguageModel {
@@ -16,15 +17,15 @@ export class GeminiModel implements LanguageModel {
   private modelId: string;
 
   constructor(opts: GeminiModelOptions) {
-    if (opts.vertexai) {
-      ensureCredentialsFileFromEnv();
-    }
+    const googleAuthOptions =
+      opts.googleAuthOptions ?? (opts.vertexai ? googleAuthOptionsFromEnv() ?? undefined : undefined);
     this.ai = new GoogleGenAI({
       apiKey: opts.apiKey,
       vertexai: opts.vertexai,
       project: opts.project,
       location: opts.location,
       apiVersion: opts.apiVersion,
+      googleAuthOptions,
     });
     this.modelId = opts.model;
   }

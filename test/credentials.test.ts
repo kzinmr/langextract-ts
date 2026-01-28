@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { ensureCredentialsFileFromEnv } from "../src/providers/gemini/credentials.js";
+import { googleAuthOptionsFromEnv } from "../src/providers/gemini/credentials.js";
 
 const ENV_KEY = "GOOGLE_APPLICATION_CREDENTIALS";
 
@@ -12,7 +12,7 @@ function createTempCredFile(): string {
   return p;
 }
 
-describe("ensureCredentialsFileFromEnv", () => {
+describe("googleAuthOptionsFromEnv", () => {
   const original = process.env[ENV_KEY];
 
   beforeEach(() => {
@@ -31,22 +31,18 @@ describe("ensureCredentialsFileFromEnv", () => {
     else delete process.env[ENV_KEY];
   });
 
-  it("accepts JSON string and writes a temp file", () => {
+  it("accepts JSON string and returns credentials", () => {
     const json = JSON.stringify({ type: "service_account", client_email: "x@y" });
     process.env[ENV_KEY] = json;
-    const result = ensureCredentialsFileFromEnv();
-    expect(result?.created).toBe(true);
-    const pathFromEnv = process.env[ENV_KEY]!;
-    expect(fs.existsSync(pathFromEnv)).toBe(true);
-    const fileData = JSON.parse(fs.readFileSync(pathFromEnv, "utf8"));
-    expect(fileData.client_email).toBe("x@y");
+    const result = googleAuthOptionsFromEnv();
+    expect(result?.credentials).toBeTruthy();
+    expect((result?.credentials as any)?.client_email).toBe("x@y");
   });
 
-  it("keeps file path as-is", () => {
+  it("returns keyFilename for file path", () => {
     const credPath = createTempCredFile();
     process.env[ENV_KEY] = credPath;
-    const result = ensureCredentialsFileFromEnv();
-    expect(result?.created).toBe(false);
-    expect(process.env[ENV_KEY]).toBe(credPath);
+    const result = googleAuthOptionsFromEnv();
+    expect(result?.keyFilename).toBe(credPath);
   });
 });

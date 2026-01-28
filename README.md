@@ -80,7 +80,9 @@ console.log(result.extractions);
 For Vertex AI, credentials can be provided via `GOOGLE_APPLICATION_CREDENTIALS` in two forms:
 
 - File path to a service account JSON
-- Raw JSON string (the library will write it to a temp file internally)
+- Raw JSON string
+
+When a JSON string is provided, it is passed to `googleAuthOptions.credentials`.
 
 ## API overview
 
