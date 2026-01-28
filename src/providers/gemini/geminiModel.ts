@@ -1,5 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import type { GenerateConfig, LanguageModel } from "../baseModel.js";
+import { ensureCredentialsFileFromEnv } from "./credentials.js";
 
 export interface GeminiModelOptions {
   apiKey?: string;
@@ -15,6 +16,9 @@ export class GeminiModel implements LanguageModel {
   private modelId: string;
 
   constructor(opts: GeminiModelOptions) {
+    if (opts.vertexai) {
+      ensureCredentialsFileFromEnv();
+    }
     this.ai = new GoogleGenAI({
       apiKey: opts.apiKey,
       vertexai: opts.vertexai,

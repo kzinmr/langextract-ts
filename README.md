@@ -75,6 +75,13 @@ const result = await extract({
 console.log(result.extractions);
 ```
 
+### Vertex credentials via `GOOGLE_APPLICATION_CREDENTIALS`
+
+For Vertex AI, credentials can be provided via `GOOGLE_APPLICATION_CREDENTIALS` in two forms:
+
+- File path to a service account JSON
+- Raw JSON string (the library will write it to a temp file internally)
+
 ## API overview
 
 ### `extract(input)`
